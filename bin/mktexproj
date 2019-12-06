@@ -1,0 +1,113 @@
+#!/usr/bin/env zsh
+
+## TODO:
+# - templates
+# - look into how diff/patch works in more detail
+
+SCRIPTNAME=$(basename "$0")
+
+PREFIX="$HOME/.local/share/mktexproj/templates/none"
+
+TEMPLATE="none"
+FILENAME=""
+MATHS=""
+OPTIMA_EULER=""
+ASSIGNMENT=""
+BIBTEX=""
+
+print_usage()
+{
+	echo "Usage: $SCRIPTNAME [-hmb] [-t TEMPLATE] filename"
+	echo "    -h\t\tPrint this message"
+	echo "    -m\t\tInclude maths packages"
+	echo "    -o\t\tUse Optima/Euler fonts (needs -m)"
+	echo "    -b\t\tCreate bibtex file and include biblatex"
+	echo "    filename\tName to give .tex file (don't include .tex)"
+}
+
+parse_options()
+{
+	zparseopts -K -- h=o_help m=o_maths o=o_opt_eul a:=o_ass \
+					 b=o_bibtex t:=o_temp
+	if [[ $? != 0 || "$o_help" != "" ]]; then
+		print_usage
+		exit $(($? ? 1 : 0))
+	fi
+
+	if [[ -v o_temp ]]; then
+		shift 2
+		TEMPLATE=$o_temp[2]
+		if [[ "$TEMPLATE" != "none" ]]; then
+			echo "Templates haven't been implemented yet, sorry."
+			exit 1
+		fi
+	fi
+
+	if [[ -v o_maths ]]; then
+		if [[ "$@" == *"-m"* ]]; then
+			shift 1
+		fi
+		MATHS=yes
+	fi
+
+	if [[ -v o_opt_eul ]]; then
+		if [[ "$@" == *"-o"* ]]; then
+			shift 1
+		fi
+		if [[ $MATHS == yes ]]; then
+			OPTIMA_EULER=yes
+		else
+			echo "Cannot apply Optima/Euler fonts unless -m option provided."
+			exit 2
+		fi
+	fi
+
+	if [[ -v o_ass ]]; then
+		if [[ "$@" == *"-a"* ]]; then
+			shift 1
+		fi
+		shift 1
+		ASSIGNMENT=yes
+		COURSE_CODE=$o_ass[2]
+	fi
+
+	if [[ -v o_bibtex ]]; then
+		if [[ "$@" == *"-b"* ]]; then
+			shift 1
+		fi
+		BIBTEX=yes
+	fi
+
+	FILENAME="$1"
+	# If noe filename specified, complain and exit
+	if [[ -z "$FILENAME" ]]; then
+		print_usage
+		exit 1
+	fi
+
+}
+parse_options "$@"
+
+touch "$FILENAME.tex"
+cat "$PREFIX"/filename.tex > "$FILENAME.tex"
+cp "$PREFIX"/Makefile ./
+sed -i '' 's/>>>FILENAME<<</'"$FILENAME"'/' Makefile
+
+if [[ $MATHS == yes ]]; then
+	patch -s "$FILENAME.tex" "$PREFIX"/math.patch
+fi
+
+if [[ $OPTIMA_EULER == yes ]]; then
+	patch -s --no-backup-if-mismatch "$FILENAME.tex" "$PREFIX"/opt_eul.patch
+fi
+
+if [[ $ASSIGNMENT == yes ]]; then
+	patch -s --no-backup-if-mismatch "$FILENAME.tex" "$PREFIX"/assignment.patch;
+	sed -i '' 's/>>>COURSE CODE<<</'"$COURSE_CODE"'/' "$FILENAME.tex"
+fi
+
+if [[ $BIBTEX = yes ]]; then
+	patch -s --no-backup-if-mismatch "$FILENAME.tex" < "$PREFIX"/bibtex.patch
+	touch "$FILENAME.bib"
+fi
+

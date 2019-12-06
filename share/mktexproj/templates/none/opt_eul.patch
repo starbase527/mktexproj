@@ -1,0 +1,22 @@
+--- filename_simple.tex	2019-06-05 12:30:56.000000000 +1000
++++ filename.tex	2019-06-05 12:28:18.000000000 +1000
+@@ -5,10 +5,18 @@
+ 
+ \usepackage{mathtools}
+ \usepackage{lualatex-math}
+-\usepackage{unicode-math}
++\usepackage[math-style=upright]{unicode-math}
+ \usepackage{siunitx}
+ \mathtoolsset{showonlyrefs}
+ 
++\setmainfont{Optima}[ItalicFont		={* Italic},
++					 BoldFont		={* Bold},
++					 BoldItalicFont	={* Bold Italic}]
++\setmathfont{Neo Euler}
++\setmathfont[range=bb, Scale=MatchLowercase]{Latin Modern Math}
++\setmathfont[range={cal, bfcal}, Scale=MatchLowercase]{Latin Modern Math}
++\setmathfont[range={`≪, `≫}, Scale=MatchLowercase]{Latin Modern Math}
++
+ \title{}
+ \author{}
+ \date{}

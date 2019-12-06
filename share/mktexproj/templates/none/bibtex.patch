@@ -1,0 +1,30 @@
+--- filename.tex	2019-03-09 23:18:50.000000000 +1100
++++ filename.tex	2019-03-09 23:18:57.000000000 +1100
+@@ -9,6 +9,9 @@
+ \usepackage{siunitx}
+ \mathtoolsset{showonlyrefs}
+ 
++\usepackage{biblatex}
++\addbibresource{references.bib}
++
+ \title{}
+ \author{}
+ \date{}
+@@ -16,4 +19,6 @@
+ \begin{document}
+ \maketitle
+ 
++\printbibliography
++
+ \end{document}
+--- Makefile	2019-03-09 23:26:54.000000000 +1100
++++ Makefile	2019-03-09 23:27:33.000000000 +1100
+@@ -3,7 +3,7 @@
+ 
+ .PHONY: all clean
+ 
+-%.pdf: %.tex
++%.pdf: %.tex *.bib
+ 	$(TEX) $<
+ 	cp Output/$@ ./
+ 

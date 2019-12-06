@@ -1,0 +1,21 @@
+--- filename_simple.tex	2019-06-06 13:02:55.000000000 +1000
++++ filename.tex	2019-06-06 13:04:12.000000000 +1000
+@@ -3,11 +3,17 @@
+ \usepackage{luatextra}
+ \usepackage{fontspec}
+ 
++\renewcommand{\thesubsection}{(\alph{subsection})}
++
++\newcommand{\asstitle}[1]
++	{{\centering\huge{}>>>COURSE CODE<<< Assignment #1\\\vspace{1em}
++	  \centering\large{}u5370162\\}}
++
+ \title{}
+ \author{}
+ \date{}
+ 
+ \begin{document}
+-\maketitle
++\asstitle{ENTER ASSIGNMENT NUMBER HERE}
+ 
+ \end{document}
